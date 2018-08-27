@@ -1,0 +1,29 @@
+
+Team Rankings in Group
+curl -k -X GET "http://play.phoenixdart.com/selectTeamRankingAwardListMLJson.do?cpttnId=16106&searchDivision=38140&searchStage=49242&searchTeam=35250"
+
+Team Detail (Name, players, VS history, points, player rating/stat)
+curl -k -X GET "http://play.phoenixdart.com/selectTeamRankingInfoMLJson.do?cpttnId=16106&searchDivision=38140&searchStage=49242&searchTeam=35250"
+
+Team Match History
+curl -k -X GET "http://play.phoenixdart.com/selectMatchTeamHistListMLJson.do?cpttnId=16106&searchDivision=38140&searchStage=49242&searchTeam=35250&curPage=1"
+
+Player Details
+curl -k -X GET "http://play.phoenixdart.com/selectPlyrResultAwardListWithCntMLJson.do?cpttnId=16106&searchDivision=38140&searchStage=49242&searchTeam=35250"
+
+Shop Detail
+curl -k -X GET "http://play.phoenixdart.com/selectShpAreaListDetailJson.do?searchShp=59399"
+
+
+
+
+Stage Select (N/A)
+curl -k -X GET "http://play.phoenixdart.com/selectStageJson.do?cpttnType=ML&cpttnId=16106&dvId=38140"
+
+Team list in Group (Responses HTML):
+curl -k -X GET "http://play.phoenixdart.com/selectMatchTableListMLJson.do?cpttnId=16106&searchDivision=38140&searchStage=49242"
+
+Others:
+"selectLoginBannerListJson.do",
+"selectQuickMenuTab2Json.do",
+"selectMatchTeamVSListJson.do",

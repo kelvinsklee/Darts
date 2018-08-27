@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		
+
+		<title>PHOENIX OFFICIAL COMPETITION</title>
+		
+		{teamSummaryHeader}
+	 	
+	</head>
+	
+	<body>
+
+	
+	<div class="innerDiv">
+
+			
+			<!-- team_info_box -->
+			<div class="player_info_box">
+
+				<!-- Match Detail -->
+				<div class="box chart">
+					<div class="box_inner">
+						<div class="hero-gallery">
+							<div class="hero-gallery__cell">
+								<p class="tit">Match Information</p>
+								<dl>
+									<dt>日期</dt> <!-- 승 -->
+									<dd><p class="date">{NextMatch.plyngStrtDt}</p></dd>
+								</dl>
+								<dl>
+									<dt>地點</dt> <!-- 패 -->
+									<dd><a class="map_link" href="http://play.phoenixdart.com/selectHmShopCpttnList.do?sSeq={NextMatchShop.sSeq}" target="_blank">{NextMatchShop.name}</a></dd>
+								</dl>
+								<dl>
+									<dt>地址</dt> <!-- 승률 -->
+									<dd><a class="map_link" href="http://www.google.com/maps/?q={NextMatchShop.latitude},{NextMatchShop.longitude}" target="_blank">{NextMatchShop.address}</a></dd>
+								</dl>
+								<dl>
+									<dt>Link</dt> <!-- 승 -->
+									<dd><a class="map_link" href="http://play.phoenixdart.com/selectMatchDetailML.do?cpttnId={competitionId}&searchDivision={divisionId}&searchStage={stageId}&brcktId={NextMatch.brcktId}" target="_blank">比賽細節</a></dd>
+								</dl>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				
+				<div class="profile profile2">
+					<div class="img">
+						<p class="resize_photo">
+							
+									<img src="http://play.phoenixdart.com/downloadTeamInforImage.do?teamId={AgainstTeamDetail.teamId}" alt="" onerror="this.src='http://images.phoenixdart.com/pdcs/front/images/no_team_image.gif'" />
+							
+						</p>
+					</div>
+					<div class="info">
+						<p class="name">{AgainstTeamDetail.teamNm}</p>
+						<p class="team">{AgainstTeamDetail.cptNm}</p>
+						<p class="home">
+							<span class="h_name">{AgainstTeamDetail.shpNm}</span>
+						</p>
+					</div>
+				</div>
+
+				
+				<div class="box chart">
+					<div class="box_inner">
+						<div class="hero-gallery">
+							<div class="hero-gallery__cell">
+								<p class="tit">Team Summary</p>
+								<!--
+								<dl>
+									<dt>Rank</dt>
+									<dd>{AgainstTeamDetail.rankNum}</dd>
+								</dl>
+								-->
+								<dl>
+									<dt>Rating</dt>
+									<dd>{AgainstTeamDetail.teamRtg}</dd>
+								</dl>
+								<dl>
+									<dt>PPD</dt>
+									<dd>{AgainstTeamDetail.teamPpd}</dd>
+								</dl>
+								<dl>
+									<dt>MPR</dt>
+									<dd>{AgainstTeamDetail.teamMpr}</dd>
+								</dl>
+								<dl>
+									<dt>勝:敗</dt>
+									<dd>{AgainstTeamDetail.setWin}:{AgainstTeamDetail.setLose} ({AgainstTeamDetail.setRatio})</dd>
+								</dl>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+				
+				<div class="box total">
+					<div class="box_inner">
+						<p class="tit">排名</p> <!-- Total Point -->
+						<p class="point">{AgainstTeamDetail.rankNum}</p>
+					</div>
+				</div>
+
+				
+			</div>
+
+
+			<!-- Player Rankings -->
+			<div class="ranking_form additional">
+				<div class="h_a_tit">
+					<p class="home">
+						<span class="h_a">Against</span> <!-- 홈 -->
+						<span style="text-decoration: underline;" >{AgainstTeamDetail.teamNm}</span>
+					</p>
+				</div>
+		
+				<table class="tb_style01 tb_style_award" summary="">
+					<thead>
+						<tr>
+							<th class="rank" rowspan="2">排名</th><!-- 순위 -->
+							<th class="team" rowspan="2">玩家</th><!-- 플레이어 -->
+							<th class="rank_active" rowspan="2">Rating</th>
+							<th class="ppd" rowspan="2">PPD</th>
+							<th class="mpr" rowspan="2">MPR</th>
+							<th colspan="4">Set</th>
+						</tr>
+						<tr>
+							<th>Total</th>
+							<th>勝</th> <!-- 승 -->
+							<th>敗</th> <!-- 패 -->
+							<th>勝率</th> <!-- 무 -->
+						</tr>
+					</thead>
+					<tbody id="tbody_plyrARankingAwardList" class="even_auto">
+						
+						{againstTeamPlayerListItems}
+						
+					</tbody>
+				</table>
+			</div>
+
+
+			
+			<!-- Player Rankings -->
+			<div class="ranking_form additional">
+				<div class="h_a_tit">
+					<p class="away">
+						<span class="h_a">Home</span> <!-- 홈 -->
+						<span style="text-decoration: underline;" >{OurTeamDetail.teamNm}</span>
+					</p>
+				</div>
+		
+				<table class="tb_style01 tb_style_award" summary="">
+					<thead>
+						<tr>
+							<th class="rank" rowspan="2">排行</th><!-- 순위 -->
+							<th class="team" rowspan="2">玩家</th><!-- 플레이어 -->
+							<th class="rank_active" rowspan="2">Rating</th>
+							<th class="ppd" rowspan="2">PPD</th>
+							<th class="mpr" rowspan="2">MPR</th>
+							<th colspan="4">Set</th>
+						</tr>
+						<tr>
+							<th>Total</th>
+							<th>勝</th> <!-- 승 -->
+							<th>敗</th> <!-- 패 -->
+							<th>勝率</th> <!-- 무 -->
+						</tr>
+					</thead>
+					<tbody id="tbody_plyrARankingAwardList" class="even_auto">
+						
+						{ourTeamPlayerListItems}
+						
+					</tbody>
+				</table>
+			</div>			
+			
+			
+			<!-- Team Rankings -->
+			<div class="con_title_04">
+				<h5>聯賽排名</h5> <!-- 리그 순위 -->
+			</div>
+			
+			<div class="ranking_form">
+				<table class="tb_style01" summary="">
+					<thead>
+						<tr>
+							<th width="5%" rowspan="2" class="rank">排行</th><!-- 순위 -->
+							<th width="39%" colspan="4" >隊伍</th><!-- 팀 -->
+							<th width="9%" rowspan="2"  class="sort_team t_point cursor rank_active" id="teamSort-total_point">總積分</th><!-- Total Point -->
+							<th width="21%" colspan="3" >Match</th><!-- Match -->
+							<th width="21%" colspan="3">Set</th><!-- Set -->
+							<th width="5%" rowspan="2" class="sort_team cursor" id="teamSort-pnt_pt_num">罰分</th><!-- 벌점 -->
+						</tr>
+						<tr>
+							<th class="team">隊名</th> <!-- 팀 이름 -->
+							
+								
+								
+								
+									<th class="sort_team cursor" id="teamSort-rating" width="40px">Rating</th>
+								
+							
+							<th class="sort_team cursor" id="teamSort-ppd_ta" width="35px">PPD</th>
+							<th class="sort_team cursor" id="teamSort-mpr_ta" width="35px">MPR</th>
+							<th class="sort_team cursor" id="teamSort-win_gm_cnt">勝</th><!-- 승 -->
+							<th class="sort_team cursor" id="teamSort-lose_gm_cnt">敗</th><!-- 패 -->
+							<th class="sort_team cursor" id="teamSort-match_ratio">勝率</th><!-- 승률 -->
+							<th class="sort_team cursor" id="teamSort-win_set_cnt">勝</th><!-- 승 -->
+							<th class="sort_team cursor" id="teamSort-lose_set_cnt">敗</th><!-- 패 -->
+							<th class="sort_team cursor" id="teamSort-set_rto_num">勝率</th><!-- 승률 -->
+						</tr>
+					</thead>
+				
+					<tbody id="tbody_teamRankingList" class="even_auto">
+				
+							{teamListItems}
+					
+					</tbody>
+				</table>
+				
+			</div>
+
+			
+			
+		</div>
+		
+		
+
+	</body>
+</html>
