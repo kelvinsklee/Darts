@@ -89,11 +89,9 @@ let main argv =
                                     let teamHtml  = teamHtml.Replace("{TeamSummary.totalPt}", HttpUtility.HtmlEncode(team.totalPt.ToString()))
                                     let teamHtml  = teamHtml.Replace("{TeamSummary.matchWin}", HttpUtility.HtmlEncode(team.matchWin.ToString()))
                                     let teamHtml  = teamHtml.Replace("{TeamSummary.matchLose}", HttpUtility.HtmlEncode(team.matchLose.ToString()))
-                                    let teamHtml  = teamHtml.Replace("{TeamSummary.matchRatio}", HttpUtility.HtmlEncode(team.matchRatio.ToString()))
                                     let teamHtml  = teamHtml.Replace("{TeamSummary.setWin}", HttpUtility.HtmlEncode(team.setWin.ToString()))
                                     let teamHtml  = teamHtml.Replace("{TeamSummary.setLose}", HttpUtility.HtmlEncode(team.setLose.ToString()))
                                     let teamHtml  = teamHtml.Replace("{TeamSummary.setRatio}", HttpUtility.HtmlEncode(team.setRatio.ToString()+"%"))
-                                    let teamHtml  = teamHtml.Replace("{TeamSummary.penaltyPt}", HttpUtility.HtmlEncode(team.penaltyPt.ToString()))
                                     let teamHtml  = teamHtml.Replace("{TeamSummary.imageSource}", if (team.imgMd5Txt.Length>0) then 
                                                                                                         HttpUtility.HtmlEncode("http://play.phoenixdart.com/downloadTeamInforImage.do?teamId=" + team.teamId)
                                                                                                   else
@@ -151,7 +149,7 @@ let main argv =
     let summaryHtml = summaryHtml.Replace("{OurTeamDetail.rankNum}", HttpUtility.HtmlEncode(ourTeam.rankNum.ToString()))
     let summaryHtml = summaryHtml.Replace("{AgainstTeamDetail.teamId}", HttpUtility.HtmlEncode(nextAgainstTeam.teamId.ToString()))
     let summaryHtml = summaryHtml.Replace("{AgainstTeamDetail.teamNm}", HttpUtility.HtmlEncode(nextAgainstTeam.teamNm.ToString()))
-    let summaryHtml = summaryHtml.Replace("{AgainstTeamDetail.rankNum}", HttpUtility.HtmlEncode((nextAgainstTeam.rankNum.ToString() + "/" + teams.Length.ToString())))
+    let summaryHtml = summaryHtml.Replace("{AgainstTeamDetail.rankNum}", HttpUtility.HtmlEncode((nextAgainstTeam.rankNum.ToString())))
     let summaryHtml = summaryHtml.Replace("{AgainstTeamDetail.cptNm}", HttpUtility.HtmlEncode(nextAgainstTeam.cptNm.ToString()))
     let summaryHtml = summaryHtml.Replace("{AgainstTeamDetail.shpNm}", HttpUtility.HtmlEncode(nextAgainstTeam.shpNm.ToString()))
     let summaryHtml = summaryHtml.Replace("{AgainstTeamDetail.totalPt}", HttpUtility.HtmlEncode(nextAgainstTeam.totalPt.ToString()))
@@ -186,7 +184,9 @@ let main argv =
             Console.WriteLine(String.Format("Error writing header trade to file/stream!"))
 
 
-    SendSMTPMail (new MailAddress(fromEmailAddress, fromEmailName)) toEmailAddress "POL Report" summaryHtml [||]
+    let mailSubject = String.Format("{0} - {1} vs {2}, {3}", nextMatch.cpttnNm, ourTeam.teamNm, nextAgainstTeam.teamNm, nextMatch.plyngStrtDt)
+
+    SendSMTPMail (new MailAddress(fromEmailAddress, fromEmailName)) toEmailAddress mailSubject summaryHtml [||]
 
 
 
