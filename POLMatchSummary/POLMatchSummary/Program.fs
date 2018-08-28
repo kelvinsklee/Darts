@@ -2,6 +2,7 @@
 open System.IO
 open System.Configuration
 open System.Web
+open System.Net
 open System.Data
 open System.Net.Mail
 open System.Collections.Generic
@@ -58,7 +59,7 @@ let main argv =
     let teams = readTeams(competitionId, divisionId, stageId, teamId)
 
     let ourTeam = readTeamDetail(competitionId, divisionId, stageId, teamId).[0]
-    let ourTeamPlayers = readTeamPlayerResult(competitionId, divisionId, stageId, teamId)
+    let ourTeamPlayers = readTeamPlayers(competitionId, divisionId, stageId, teamId)
 
     let teamMatches = readTeamMatchHistory(competitionId, divisionId, stageId, teamId)
     let nextMatch = findNextMatch(teamMatches)
@@ -67,7 +68,7 @@ let main argv =
     
     
     let nextAgainstTeam = readTeamDetail(competitionId, divisionId, stageId, nextAgaistTeamId).[0]
-    let nextAgainstTeamPlayers = readTeamPlayerResult(competitionId, divisionId, stageId, nextAgaistTeamId)
+    let nextAgainstTeamPlayers = readTeamPlayers(competitionId, divisionId, stageId, nextAgaistTeamId)
     let nextMatchShop = if (nextMatchShopId<>"") then readShopDetail(nextMatchShopId).[0] else NullShop
 
     let summaryTemplate = readFromTextFile(summaryTemplateFile)
@@ -106,16 +107,16 @@ let main argv =
         nextAgainstTeamPlayers
             |> Array.map(fun player ->
                                     let playerHtml = playerListItemTemplate
-                                    let playerHtml  = playerHtml.Replace("{TeamPlayerResult.rankNum}", HttpUtility.HtmlEncode(player.rankNum.ToString()))
-                                    let playerHtml  = playerHtml.Replace("{TeamPlayerResult.plyrNm}", HttpUtility.HtmlEncode(player.plyrNm.ToString()))
-                                    let playerHtml  = playerHtml.Replace("{TeamPlayerResult.rtg}", HttpUtility.HtmlEncode(player.rtg.ToString()))
-                                    let playerHtml  = playerHtml.Replace("{TeamPlayerResult.ppd}", HttpUtility.HtmlEncode(player.ppd.ToString()))
-                                    let playerHtml  = playerHtml.Replace("{TeamPlayerResult.mpr}", HttpUtility.HtmlEncode(player.mpr.ToString()))
-                                    let playerHtml  = playerHtml.Replace("{TeamPlayerResult.setTotal}", HttpUtility.HtmlEncode(player.setTotal.ToString()))
-                                    let playerHtml  = playerHtml.Replace("{TeamPlayerResult.setWin}", HttpUtility.HtmlEncode(player.setWin.ToString()))
-                                    let playerHtml  = playerHtml.Replace("{TeamPlayerResult.setLose}", HttpUtility.HtmlEncode(player.setLose.ToString()))
-                                    let playerHtml  = playerHtml.Replace("{TeamPlayerResult.setRatio}", HttpUtility.HtmlEncode(player.setRatio.ToString()+"%"))
-                                    let playerHtml  = playerHtml.Replace("{TeamPlayerResult.imageSource}", HttpUtility.HtmlEncode("http://www.phoenixdart.com/hk/member/getmemberphoto?c_seq=" + player.cSeq))
+                                    let playerHtml  = playerHtml.Replace("{TeamPlayer.rankNum}", HttpUtility.HtmlEncode(player.rankNum.ToString()))
+                                    let playerHtml  = playerHtml.Replace("{TeamPlayer.plyrNm}", HttpUtility.HtmlEncode(player.plyrNm.ToString()))
+                                    let playerHtml  = playerHtml.Replace("{TeamPlayer.rtg}", HttpUtility.HtmlEncode(player.rtg.ToString()))
+                                    let playerHtml  = playerHtml.Replace("{TeamPlayer.ppd}", HttpUtility.HtmlEncode(player.ppd.ToString()))
+                                    let playerHtml  = playerHtml.Replace("{TeamPlayer.mpr}", HttpUtility.HtmlEncode(player.mpr.ToString()))
+                                    let playerHtml  = playerHtml.Replace("{TeamPlayer.setTotal}", HttpUtility.HtmlEncode(player.setTotal.ToString()))
+                                    let playerHtml  = playerHtml.Replace("{TeamPlayer.setWin}", HttpUtility.HtmlEncode(player.setWin.ToString()))
+                                    let playerHtml  = playerHtml.Replace("{TeamPlayer.setLose}", HttpUtility.HtmlEncode(player.setLose.ToString()))
+                                    let playerHtml  = playerHtml.Replace("{TeamPlayer.setRatio}", HttpUtility.HtmlEncode(player.setRatio.ToString()+"%"))
+                                    let playerHtml  = playerHtml.Replace("{TeamPlayer.imageSource}", HttpUtility.HtmlEncode("http://www.phoenixdart.com/hk/member/getmemberphoto?c_seq=" + player.cSeq))
                                     playerHtml
                         )
             |> String.concat("\n")
@@ -125,16 +126,16 @@ let main argv =
         ourTeamPlayers
             |> Array.map(fun player ->
                                     let playerHtml = playerListItemTemplate
-                                    let playerHtml  = playerHtml.Replace("{TeamPlayerResult.rankNum}", HttpUtility.HtmlEncode(player.rankNum.ToString()))
-                                    let playerHtml  = playerHtml.Replace("{TeamPlayerResult.plyrNm}", HttpUtility.HtmlEncode(player.plyrNm.ToString()))
-                                    let playerHtml  = playerHtml.Replace("{TeamPlayerResult.rtg}", HttpUtility.HtmlEncode(player.rtg.ToString()))
-                                    let playerHtml  = playerHtml.Replace("{TeamPlayerResult.ppd}", HttpUtility.HtmlEncode(player.ppd.ToString()))
-                                    let playerHtml  = playerHtml.Replace("{TeamPlayerResult.mpr}", HttpUtility.HtmlEncode(player.mpr.ToString()))
-                                    let playerHtml  = playerHtml.Replace("{TeamPlayerResult.setTotal}", HttpUtility.HtmlEncode(player.setTotal.ToString()))
-                                    let playerHtml  = playerHtml.Replace("{TeamPlayerResult.setWin}", HttpUtility.HtmlEncode(player.setWin.ToString()))
-                                    let playerHtml  = playerHtml.Replace("{TeamPlayerResult.setLose}", HttpUtility.HtmlEncode(player.setLose.ToString()))
-                                    let playerHtml  = playerHtml.Replace("{TeamPlayerResult.setRatio}", HttpUtility.HtmlEncode(player.setRatio.ToString()+"%"))
-                                    let playerHtml  = playerHtml.Replace("{TeamPlayerResult.imageSource}", HttpUtility.HtmlEncode("http://www.phoenixdart.com/hk/member/getmemberphoto?c_seq=" + player.cSeq))
+                                    let playerHtml  = playerHtml.Replace("{TeamPlayer.rankNum}", HttpUtility.HtmlEncode(player.rankNum.ToString()))
+                                    let playerHtml  = playerHtml.Replace("{TeamPlayer.plyrNm}", HttpUtility.HtmlEncode(player.plyrNm.ToString()))
+                                    let playerHtml  = playerHtml.Replace("{TeamPlayer.rtg}", HttpUtility.HtmlEncode(player.rtg.ToString()))
+                                    let playerHtml  = playerHtml.Replace("{TeamPlayer.ppd}", HttpUtility.HtmlEncode(player.ppd.ToString()))
+                                    let playerHtml  = playerHtml.Replace("{TeamPlayer.mpr}", HttpUtility.HtmlEncode(player.mpr.ToString()))
+                                    let playerHtml  = playerHtml.Replace("{TeamPlayer.setTotal}", HttpUtility.HtmlEncode(player.setTotal.ToString()))
+                                    let playerHtml  = playerHtml.Replace("{TeamPlayer.setWin}", HttpUtility.HtmlEncode(player.setWin.ToString()))
+                                    let playerHtml  = playerHtml.Replace("{TeamPlayer.setLose}", HttpUtility.HtmlEncode(player.setLose.ToString()))
+                                    let playerHtml  = playerHtml.Replace("{TeamPlayer.setRatio}", HttpUtility.HtmlEncode(player.setRatio.ToString()+"%"))
+                                    let playerHtml  = playerHtml.Replace("{TeamPlayer.imageSource}", HttpUtility.HtmlEncode("http://www.phoenixdart.com/hk/member/getmemberphoto?c_seq=" + player.cSeq))
                                     playerHtml
                         )
             |> String.concat("\n")
@@ -172,7 +173,7 @@ let main argv =
     let summaryHtml = summaryHtml.Replace("{teamSummaryHeader}", summaryHeaderHtml)
     
 
-    
+
     //Write to Html
     try
         let sw = new System.IO.StreamWriter("C:\\Temp\\POLSummaryOutput.html")

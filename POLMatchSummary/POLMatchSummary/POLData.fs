@@ -236,7 +236,32 @@ module POLData =
             plyrResultList: TeamPlayerResult[]
         }
 
+    ///Player Result/Detail
+    type TeamPlayerGeneral =
+        {
+            plyrId: string
+            sexTpNm: string
+        }
 
+    ///Player detail
+    type TeamPlayerSummary =
+        {
+            cSeq: string
+            gender: string 
+            mpr: string
+            plyrId: string
+            plyrNm: string
+            ppd: string
+            rankNum: int
+            rtg: string
+            setDraw: int
+            setLose: int
+            setRatio: int
+            setTotal: int
+            setWin: int
+            teamId: string
+            teamNm: string
+        }
 
     ///Team Detail
     type ShopDetail =
@@ -255,6 +280,21 @@ module POLData =
     type ShopDetailPage =
         {
             teamDetail: ShopDetail
+        }
+
+
+    type MatchLineUp =
+        {
+            complete: bool
+            set1: TeamPlayerSummary[]
+            set2: TeamPlayerSummary[]
+            set3: TeamPlayerSummary[]
+            set4: TeamPlayerSummary[]
+            set5: TeamPlayerSummary[]
+            set6: TeamPlayerSummary[]
+            set7: TeamPlayerSummary[]
+            set8: TeamPlayerSummary[]
+            set9: TeamPlayerSummary[]
         }
 
 
@@ -447,13 +487,14 @@ module POLData =
 
 
     ///Read team player details and results from POL
-    let readTeamPlayerResult(competitionId:String, divisionId:string, stageId:string, teamId:string) = 
+    let readTeamPlayers(competitionId:String, divisionId:string, stageId:string, teamId:string) = 
         
-        let uri = String.Format("http://play.phoenixdart.com/selectPlyrResultAwardListWithCntMLJson.do?cpttnId={0}&searchDivision={1}&searchStage={2}&searchTeam={3}", competitionId, divisionId, stageId, teamId)
+        let uriResults = String.Format("http://play.phoenixdart.com/selectPlyrResultAwardListWithCntMLJson.do?cpttnId={0}&searchDivision={1}&searchStage={2}&searchTeam={3}", competitionId, divisionId, stageId, teamId)
+        let uriPlayers = String.Format("http://play.phoenixdart.com/selectTeamMembersListJson.do?teamId={0}", teamId)
 
         //Read from API
         buffer <- [||]
-        let curlResult = readRestData(uri, WriteToBuffer, true)
+        let curlResult = readRestData(uriResults, WriteToBuffer, true)
 
         //Deserialize data
         let teamPlayerResults = 
@@ -463,15 +504,75 @@ module POLData =
                     let playerResultsCurPage = teamPlayerResultPages.[0].plyrResultList
                     if ((playerResultsCurPage<>null) && (playerResultsCurPage.Length>0)) then
                         playerResultsCurPage
+                        |> Array.map(fun p -> (p.plyrId, p))
+                        |> dict
+
                     else
                         [||]
+                        |> dict
                 else
                     [||]
+                    |> dict
             else
                 [||]
-        
-        teamPlayerResults 
+                |> dict
 
+        
+        //Read from API
+        buffer <- [||]
+        let curlResult = readRestData(uriPlayers, WriteToBuffer, true)
+
+        //Deserialize data
+        let teamPlayers = 
+            if (curlResult=CURLcode.CURLE_OK) then //If response OK
+                let players:TeamPlayerGeneral[] = DeserializeJSON(buffer, typeof<TeamPlayerGeneral>)
+                if ((players<>null) && (players.Length>0)) then
+                    players
+                        |> Array.map(fun p -> (p.plyrId, p.sexTpNm))
+                        |> dict
+                else
+                    [||]
+                    |> dict
+            else
+                [||]
+                |> dict
+
+        
+        let teamPlayerIds = 
+            teamPlayerResults.Values
+                |> Seq.toArray
+                |> Array.map(fun p -> p.plyrId)
+
+        
+        let teamPlayerSummaries = 
+            [| for id in teamPlayerIds do
+                    let succ, gen = teamPlayers.TryGetValue(id)
+                    let gender = if succ then
+                                    if gen.StartsWith("F") then "F" else "M"
+                                 else
+                                    "M"
+                    let tpr = teamPlayerResults.Item(id)
+
+                    yield
+                        {plyrId=id; 
+                        cSeq=tpr.cSeq;
+                        gender=gender; 
+                        mpr=tpr.mpr;
+                        plyrNm=tpr.plyrNm;
+                        ppd=tpr.ppd;
+                        rankNum=tpr.rankNum;
+                        rtg=tpr.rtg;
+                        setDraw=tpr.setDraw;
+                        setLose=tpr.setLose;
+                        setRatio=tpr.setRatio;
+                        setTotal=tpr.setTotal;
+                        setWin=tpr.setWin;
+                        teamId=tpr.teamId;
+                        teamNm=tpr.teamNm;
+                        }
+                |]
+        
+        teamPlayerSummaries
 
 
     ///Read shop details from POL
@@ -505,6 +606,54 @@ module POLData =
             |> Array.filter(fun m -> DateTime.Parse(m.plyngStrtDt.Substring(0, 10)) >= DateTime.Today)
             |> Array.minBy(fun m -> DateTime.Parse(m.plyngStrtDt.Substring(0, 10)))
 
+
+
+    ///find strongest POL line-up for team
+    let findStrongestLineUp(players:TeamPlayerSummary[]) = 
+        
+        let playersSorted = 
+                        players
+                            |> Array.sortBy(fun p -> Convert.ToDouble(p.rtg))
+
+        let femalePlayers = 
+                        playersSorted
+                            |> Array.filter(fun p -> p.gender="F")
+
+        
+        if ((playersSorted.Length>=5) && (femalePlayers.Length>=1)) then
+            
+            let topFemalePlayer = femalePlayers.[0]
+            let topPlayers = 
+                    playersSorted
+                        |> Array.filter(fun p -> p.plyrId <> topFemalePlayer.plyrId)
+                        |> Array.take 5
+
+            //Lineup Object
+            {
+                complete = true;
+                set1= [|topPlayers.[0];topPlayers.[1];topPlayers.[4];topFemalePlayer|];
+                set2= [|topPlayers.[0];topFemalePlayer|];
+                set3= [|topPlayers.[1];topPlayers.[2]|];
+                set4= [|topPlayers.[0];topPlayers.[3];topPlayers.[4];topFemalePlayer|];
+                set5= [|topFemalePlayer|];
+                set6= [|topPlayers.[3]|];
+                set7= [|topPlayers.[2]|];
+                set8= [|topPlayers.[1]|];
+                set9= [|topPlayers.[0]|]
+            }
+        else
+            {
+                complete = true;
+                set1= [||];
+                set2= [||];
+                set3= [||];
+                set4= [||];
+                set5= [||];
+                set6= [||];
+                set7= [||];
+                set8= [||];
+                set9= [||]
+            }
 
 
 
