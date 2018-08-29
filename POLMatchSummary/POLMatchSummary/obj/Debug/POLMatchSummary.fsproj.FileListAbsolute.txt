@@ -1,0 +1,14 @@
+C:\BitBucket\VisualStudio\Darts\POLMatchSummary\POLMatchSummary\bin\Debug\libcurl.dll
+C:\BitBucket\VisualStudio\Darts\POLMatchSummary\POLMatchSummary\bin\Debug\LibCurlShim.dll
+C:\BitBucket\VisualStudio\Darts\POLMatchSummary\POLMatchSummary\bin\Debug\POLMatchSummary.exe.config
+C:\BitBucket\VisualStudio\Darts\POLMatchSummary\POLMatchSummary\bin\Debug\POLMatchSummary.XML
+C:\BitBucket\VisualStudio\Darts\POLMatchSummary\POLMatchSummary\bin\Debug\POLMatchSummary.exe
+C:\BitBucket\VisualStudio\Darts\POLMatchSummary\POLMatchSummary\bin\Debug\POLMatchSummary.pdb
+C:\BitBucket\VisualStudio\Darts\POLMatchSummary\POLMatchSummary\bin\Debug\FSharp.Core.dll
+C:\BitBucket\VisualStudio\Darts\POLMatchSummary\POLMatchSummary\bin\Debug\libcurl.NET.dll
+C:\BitBucket\VisualStudio\Darts\POLMatchSummary\POLMatchSummary\bin\Debug\Newtonsoft.Json.dll
+C:\BitBucket\VisualStudio\Darts\POLMatchSummary\POLMatchSummary\bin\Debug\libcurl.NET.xml
+C:\BitBucket\VisualStudio\Darts\POLMatchSummary\POLMatchSummary\bin\Debug\FSharp.Core.xml
+C:\BitBucket\VisualStudio\Darts\POLMatchSummary\POLMatchSummary\bin\Debug\Newtonsoft.Json.xml
+C:\BitBucket\VisualStudio\Darts\POLMatchSummary\POLMatchSummary\obj\Debug\POLMatchSummary.exe
+C:\BitBucket\VisualStudio\Darts\POLMatchSummary\POLMatchSummary\obj\Debug\POLMatchSummary.pdb

@@ -58,38 +58,6 @@ let main argv =
     //let shopDetail = readShopDetail("59399")
 
 
-    let webRequest = createPOLWebRequest("http://play.phoenixdart.com/selectMatchDetailML.do?cpttnId=16106&searchDivision=38140&searchStage=49242&brcktId=666153")
-    let webResponse = webRequest.GetResponse() :?> HttpWebResponse
-    
-    let matchHtml = readFromTextStream(webResponse.GetResponseStream())
-    let setsGross = matchHtml.Split([|"""<div class="result_match_each">"""|], StringSplitOptions.RemoveEmptyEntries) |> Array.tail
-    let playerIdsGross = 
-                    setsGross
-                        |> Array.map(fun setGross -> 
-                                        let playersGross = setGross.Split([|"""getmemberphoto?c_seq="""|], StringSplitOptions.RemoveEmptyEntries) |> Array.tail
-                                        playersGross
-                                            |> Array.map(fun playerGross ->
-                                                                let endPos = playerGross.IndexOf("\"")
-                                                                playerGross.Substring(0, endPos)
-                                                        )
-                                    )
-    let playerIds = [|
-                        [|playerIdsGross.[0].[0]; playerIdsGross.[0].[0]; playerIdsGross.[0].[0]; playerIdsGross.[0].[0];|]
-                    |]
-
-
-    Console.WriteLine(matchHtml)
-    //Write to Html
-    try
-        let sw = new System.IO.StreamWriter("C:\\Temp\\POLTestOutput.html")
-                                
-        sw.WriteLine(matchHtml)
-        sw.Close()
-    with 
-        | exn -> 
-            Console.WriteLine(String.Format("Error writing header trade to file/stream!"))
-
-
     let teams = readTeams(competitionId, divisionId, stageId, teamId)
 
     let ourTeam = readTeamDetail(competitionId, divisionId, stageId, teamId).[0]
@@ -181,17 +149,32 @@ let main argv =
 
 
 
-    let nextAgainstTeamStrongestLineUp = findStrongestLineUp(nextAgainstTeamPlayers)
-    let mutable nextAgainstTeamLineUpHtml = lineUpTemplate
-    
-    for iSet = 0 to nextAgainstTeamStrongestLineUp.sets.Length-1 do
-        for iPlayer = 0 to nextAgainstTeamStrongestLineUp.sets.[iSet].Length-1 do
-            nextAgainstTeamLineUpHtml <- nextAgainstTeamLineUpHtml.Replace(String.Format("{{Player.{0}.{1}.cSeq}}", iSet, iPlayer), HttpUtility.HtmlEncode(nextAgainstTeamStrongestLineUp.sets.[iSet].[iPlayer].cSeq.ToString()))
-            nextAgainstTeamLineUpHtml <- nextAgainstTeamLineUpHtml.Replace(String.Format("{{Player.{0}.{1}.plyrNm}}", iSet, iPlayer), HttpUtility.HtmlEncode(nextAgainstTeamStrongestLineUp.sets.[iSet].[iPlayer].plyrNm.ToString()))
-            nextAgainstTeamLineUpHtml <- nextAgainstTeamLineUpHtml.Replace(String.Format("{{Player.{0}.{1}.rtg}}", iSet, iPlayer), HttpUtility.HtmlEncode(nextAgainstTeamStrongestLineUp.sets.[iSet].[iPlayer].rtg.ToString()))
-            nextAgainstTeamLineUpHtml <- nextAgainstTeamLineUpHtml.Replace(String.Format("{{Player.{0}.{1}.ppd}}", iSet, iPlayer), HttpUtility.HtmlEncode(nextAgainstTeamStrongestLineUp.sets.[iSet].[iPlayer].ppd.ToString()))
-            nextAgainstTeamLineUpHtml <- nextAgainstTeamLineUpHtml.Replace(String.Format("{{Player.{0}.{1}.mpr}}", iSet, iPlayer), HttpUtility.HtmlEncode(nextAgainstTeamStrongestLineUp.sets.[iSet].[iPlayer].mpr.ToString()))
+    let nextAgainstTeamStrongestLineUp = getStrongestLineUp(nextAgainstTeamPlayers)
+    let mutable nextAgainstTeamStrongestLineUpHtml = lineUpTemplate
+    if nextAgainstTeamStrongestLineUp.complete then
+        for iSet = 0 to nextAgainstTeamStrongestLineUp.sets.Length-1 do
+            for iPlayer = 0 to nextAgainstTeamStrongestLineUp.sets.[iSet].Length-1 do
+                nextAgainstTeamStrongestLineUpHtml <- nextAgainstTeamStrongestLineUpHtml.Replace(String.Format("{{Player.{0}.{1}.cSeq}}", iSet, iPlayer), HttpUtility.HtmlEncode(nextAgainstTeamStrongestLineUp.sets.[iSet].[iPlayer].cSeq.ToString()))
+                nextAgainstTeamStrongestLineUpHtml <- nextAgainstTeamStrongestLineUpHtml.Replace(String.Format("{{Player.{0}.{1}.plyrNm}}", iSet, iPlayer), HttpUtility.HtmlEncode(nextAgainstTeamStrongestLineUp.sets.[iSet].[iPlayer].plyrNm.ToString()))
+                nextAgainstTeamStrongestLineUpHtml <- nextAgainstTeamStrongestLineUpHtml.Replace(String.Format("{{Player.{0}.{1}.rtg}}", iSet, iPlayer), HttpUtility.HtmlEncode(nextAgainstTeamStrongestLineUp.sets.[iSet].[iPlayer].rtg.ToString()))
+                nextAgainstTeamStrongestLineUpHtml <- nextAgainstTeamStrongestLineUpHtml.Replace(String.Format("{{Player.{0}.{1}.ppd}}", iSet, iPlayer), HttpUtility.HtmlEncode(nextAgainstTeamStrongestLineUp.sets.[iSet].[iPlayer].ppd.ToString()))
+                nextAgainstTeamStrongestLineUpHtml <- nextAgainstTeamStrongestLineUpHtml.Replace(String.Format("{{Player.{0}.{1}.mpr}}", iSet, iPlayer), HttpUtility.HtmlEncode(nextAgainstTeamStrongestLineUp.sets.[iSet].[iPlayer].mpr.ToString()))
+    else
+        nextAgainstTeamStrongestLineUpHtml <- "<div><p>沒有數據</p></div>"
 
+
+    let nextAgainstTeamPredictedLineUp = getPredictedLineUp(competitionId, divisionId, stageId, nextAgainstTeam, nextAgainstTeamPlayers)
+    let mutable nextAgainstTeamPredictedLineUpHtml = lineUpTemplate
+    if nextAgainstTeamPredictedLineUp.complete then
+        for iSet = 0 to nextAgainstTeamPredictedLineUp.sets.Length-1 do
+            for iPlayer = 0 to nextAgainstTeamPredictedLineUp.sets.[iSet].Length-1 do
+                nextAgainstTeamPredictedLineUpHtml <- nextAgainstTeamPredictedLineUpHtml.Replace(String.Format("{{Player.{0}.{1}.cSeq}}", iSet, iPlayer), HttpUtility.HtmlEncode(nextAgainstTeamPredictedLineUp.sets.[iSet].[iPlayer].cSeq.ToString()))
+                nextAgainstTeamPredictedLineUpHtml <- nextAgainstTeamPredictedLineUpHtml.Replace(String.Format("{{Player.{0}.{1}.plyrNm}}", iSet, iPlayer), HttpUtility.HtmlEncode(nextAgainstTeamPredictedLineUp.sets.[iSet].[iPlayer].plyrNm.ToString()))
+                nextAgainstTeamPredictedLineUpHtml <- nextAgainstTeamPredictedLineUpHtml.Replace(String.Format("{{Player.{0}.{1}.rtg}}", iSet, iPlayer), HttpUtility.HtmlEncode(nextAgainstTeamPredictedLineUp.sets.[iSet].[iPlayer].rtg.ToString()))
+                nextAgainstTeamPredictedLineUpHtml <- nextAgainstTeamPredictedLineUpHtml.Replace(String.Format("{{Player.{0}.{1}.ppd}}", iSet, iPlayer), HttpUtility.HtmlEncode(nextAgainstTeamPredictedLineUp.sets.[iSet].[iPlayer].ppd.ToString()))
+                nextAgainstTeamPredictedLineUpHtml <- nextAgainstTeamPredictedLineUpHtml.Replace(String.Format("{{Player.{0}.{1}.mpr}}", iSet, iPlayer), HttpUtility.HtmlEncode(nextAgainstTeamPredictedLineUp.sets.[iSet].[iPlayer].mpr.ToString()))
+    else
+        nextAgainstTeamPredictedLineUpHtml <- "<div><p>沒有數據</p></div>"
 
 
     let summaryHtml = summaryTemplate
@@ -222,7 +205,8 @@ let main argv =
     let summaryHtml = summaryHtml.Replace("{NextMatchShop.sSeq}", HttpUtility.HtmlEncode(nextMatchShop.sSeq.ToString()))
     let summaryHtml = summaryHtml.Replace("{againstTeamPlayerListItems}", againstPlayerListHtml)
     let summaryHtml = summaryHtml.Replace("{ourTeamPlayerListItems}", ourPlayerListHtml)
-    let summaryHtml = summaryHtml.Replace("{againstTeamLineUp}", nextAgainstTeamLineUpHtml)
+    let summaryHtml = summaryHtml.Replace("{againstTeamPredictedLineUp}", nextAgainstTeamPredictedLineUpHtml)
+    let summaryHtml = summaryHtml.Replace("{againstTeamStrongestLineUp}", nextAgainstTeamStrongestLineUpHtml)
     let summaryHtml = summaryHtml.Replace("{teamSummaryHeader}", summaryHeaderHtml)
     let summaryHtml = summaryHtml.Replace("{teamListItems}", teamListHtml)
     

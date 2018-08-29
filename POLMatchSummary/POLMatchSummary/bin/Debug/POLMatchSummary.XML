@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+<assembly><name>POLMatchSummary</name></assembly>
+<members>
+<member name="T:POL.POLData.ShopDetailPage">
+<summary>
+Team Detail Page
+</summary>
+</member>
+<member name="T:POL.POLData.ShopDetail">
+<summary>
+Team Detail
+</summary>
+</member>
+<member name="T:POL.POLData.TeamPlayerSummary">
+<summary>
+Player detail
+</summary>
+</member>
+<member name="T:POL.POLData.TeamPlayerGeneral">
+<summary>
+Player Result/Detail
+</summary>
+</member>
+<member name="T:POL.POLData.TeamPlayerResultPage">
+<summary>
+Player Result Page
+</summary>
+</member>
+<member name="T:POL.POLData.TeamPlayerResult">
+<summary>
+Player Result/Detail
+</summary>
+</member>
+<member name="T:POL.POLData.TeamMatchHistoryPage">
+<summary>
+Team History Page
+</summary>
+</member>
+<member name="T:POL.POLData.TeamMatchHistory">
+<summary>
+Team Match History
+</summary>
+</member>
+<member name="T:POL.POLData.TeamDetailPage">
+<summary>
+Team Detail Page
+</summary>
+</member>
+<member name="T:POL.POLData.TeamDetail">
+<summary>
+Team Detail
+</summary>
+</member>
+<member name="T:POL.POLData.TeamSummary">
+<summary>
+Team Summary
+</summary>
+</member>
+<member name="M:POL.POLData.getPredictedLineUp(System.String,System.String,System.String,POL.POLData.TeamDetail,POL.POLData.TeamPlayerSummary[])">
+<summary>
+find strongest POL line-up for team
+</summary>
+</member>
+<member name="M:POL.POLData.getMatchLineUpCSeqIds(System.String,System.String,System.String,System.String)">
+<summary>
+find strongest POL line-up for team
+</summary>
+</member>
+<member name="M:POL.POLData.getStrongestLineUp(POL.POLData.TeamPlayerSummary[])">
+<summary>
+find strongest POL line-up for team
+</summary>
+</member>
+<member name="M:POL.POLData.findNextMatch(POL.POLData.TeamMatchHistory[])">
+<summary>
+find next match in array of matches
+</summary>
+</member>
+<member name="M:POL.POLData.readShopDetail(System.String)">
+<summary>
+Read shop details from POL
+</summary>
+</member>
+<member name="M:POL.POLData.readTeamPlayers(System.String,System.String,System.String,System.String)">
+<summary>
+Read team player details and results from POL
+</summary>
+</member>
+<member name="M:POL.POLData.readTeamMatchHistory(System.String,System.String,System.String,System.String)">
+<summary>
+Read team match history from POL
+</summary>
+</member>
+<member name="M:POL.POLData.readTeamDetail(System.String,System.String,System.String,System.String)">
+<summary>
+Read team details from POL
+</summary>
+</member>
+<member name="M:POL.POLData.readTeams(System.String,System.String,System.String,System.String)">
+<summary>
+Read teams in group from POL
+</summary>
+</member>
+<member name="M:POL.POLData.readFromStreamToBase64(System.IO.Stream)">
+<summary>
+Reads binary and covert to Base64
+</summary>
+</member>
+<member name="M:POL.POLData.readFromTextStream(System.IO.Stream)">
+<summary>
+Reads text from stream
+</summary>
+</member>
+<member name="M:POL.POLData.readFromTextFile(System.String)">
+<summary>
+Reads text from file
+</summary>
+</member>
+<member name="M:POL.POLData.createPOLWebRequest(System.String)">
+<summary>
+Create webrequest with necessary headers and cookies
+</summary>
+</member>
+<member name="M:POL.POLData.DeserializeJSON``1(System.Byte[],System.Type)">
+<summary>
+Deserialize JSON to specified object type
+</summary>
+</member>
+<member name="M:POL.POLData.readRestData(System.String,Microsoft.FSharp.Core.FSharpFunc{System.Byte[],Microsoft.FSharp.Core.FSharpFunc{System.Int32,Microsoft.FSharp.Core.FSharpFunc{System.Int32,Microsoft.FSharp.Core.FSharpFunc{System.Object,System.Int32}}}},System.Boolean)">
+<summary>
+Use lubCurl to read data from Reset API
+</summary>
+</member>
+<member name="M:POL.POLData.WriteToBuffer(System.Byte[],System.Int32,System.Int32,System.Object)">
+<summary>
+LibCurl helpter function
+</summary>
+</member>
+<member name="M:POL.POLData.OnDebug(SeasideResearch.LibCurlNet.CURLINFOTYPE,System.String,System.Object)">
+<summary>
+LibCurl helpter function
+</summary>
+</member>
+<member name="M:POL.POLData.OnWriteData(System.Byte[],System.Int32,System.Int32,System.Object)">
+<summary>
+LibCurl helpter function
+</summary>
+</member>
+<member name="M:Program.SendSMTPMail(System.Net.Mail.MailAddress,System.String,System.String,System.String,System.String[])">
+<summary>
+ Send out SMTP email
+</summary>
+</member>
+</members>
+</doc>

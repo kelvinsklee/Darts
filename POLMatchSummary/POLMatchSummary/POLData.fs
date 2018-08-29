@@ -294,6 +294,9 @@ module POLData =
     let NullShop =
         {name="Invalid Shop"; shopId=""; latitude=0.0; sSeq=0; nationcode=""; longitude=0.0; phoneNo=""; address=""}
 
+    let NullPlayer(plyrId:string) = 
+                        {plyrId=plyrId; cSeq=""; gender="M"; mpr=""; plyrNm="Unknown Player"; ppd=""; rankNum=0; rtg=""; setDraw=0; setLose=0;
+                        setRatio=0; setTotal=0; setWin=0; teamId=""; teamNm=""}
 
     let mutable buffer:Byte[] = [||]
 
@@ -637,7 +640,7 @@ module POLData =
 
 
     ///find strongest POL line-up for team
-    let findStrongestLineUp(players:TeamPlayerSummary[]) = 
+    let getStrongestLineUp(players:TeamPlayerSummary[]) = 
         
         let playersSorted = 
                         players
@@ -685,10 +688,210 @@ module POLData =
             }
         else
             {
-                complete = true;
+                complete = false;
                 sets = [||]
             }
 
+
+    ///find strongest POL line-up for team
+    let getMatchLineUpCSeqIds(competitionId:String, divisionId:string, stageId:string, matchId:string) = 
+
+        //Read match information
+        let webRequest = createPOLWebRequest(String.Format("http://play.phoenixdart.com/selectMatchDetailML.do?cpttnId={0}&searchDivision={1}&searchStage={2}&brcktId={3}", competitionId, divisionId, stageId, matchId))
+        let webResponse = webRequest.GetResponse() :?> HttpWebResponse
+    
+        let matchHtml = readFromTextStream(webResponse.GetResponseStream())
+        let setsGross = matchHtml.Split([|"""<div class="result_match_each">"""|], StringSplitOptions.RemoveEmptyEntries) |> Array.tail
+        let playerIds= 
+                    setsGross
+                        |> Array.map(fun setGross -> 
+                                        let playersGross = setGross.Split([|"""getmemberphoto?c_seq="""|], StringSplitOptions.RemoveEmptyEntries) |> Array.tail
+                                        playersGross
+                                            |> Array.map(fun playerGross ->
+                                                                let endPos = playerGross.IndexOf("\"")
+                                                                playerGross.Substring(0, endPos)
+                                                        )
+                                    )
+        let playerIdsTeamA = [|
+                                [|playerIds.[0].[0]; playerIds.[0].[1]; playerIds.[0].[2]; playerIds.[0].[3]|];
+                                [|playerIds.[1].[0]; playerIds.[0].[1]|];
+                                [|playerIds.[2].[0]; playerIds.[0].[1]|];
+                                [|playerIds.[3].[0]; playerIds.[0].[1]; playerIds.[0].[2]|];
+                                [|playerIds.[4].[0]|];
+                                [|playerIds.[5].[0]|];
+                                [|playerIds.[6].[0]|];
+                                [|playerIds.[7].[0]|];
+                                [|playerIds.[8].[0]|]
+                             |]
+
+        let playerIdsTeamB = [|
+                                [|playerIds.[0].[4]; playerIds.[0].[5]; playerIds.[0].[6]; playerIds.[0].[7]|];
+                                [|playerIds.[1].[2]; playerIds.[0].[3]|];
+                                [|playerIds.[2].[2]; playerIds.[0].[3]|];
+                                [|playerIds.[3].[3]; playerIds.[0].[4]; playerIds.[0].[5]|];
+                                [|playerIds.[4].[1]|];
+                                [|playerIds.[5].[1]|];
+                                [|playerIds.[6].[1]|];
+                                [|playerIds.[7].[1]|];
+                                [|playerIds.[8].[1]|]
+                             |]
+
+        (playerIdsTeamA, playerIdsTeamB)
+
+
+
+    ///find strongest POL line-up for team
+    let getPredictedLineUp(competitionId:String, divisionId:string, stageId:string, team:TeamDetail, teamPlayers:TeamPlayerSummary[]) = 
+
+
+        try
+
+            let teamPlayersCSeqDict = 
+                        teamPlayers
+                            |> Array.map(fun p -> (p.cSeq, p))
+                            |> dict
+
+            let pastMatchIds = 
+                    readTeamMatchHistory(competitionId, divisionId, stageId, team.teamId)
+                        |> Array.filter(fun m -> ((DateTime.Parse(m.plyngStrtDt.Substring(0, 10)) <= DateTime.Today) && (not (m.teamARsltPt.Equals("-") || m.teamBRsltPt.Equals("-")))))
+                        |> Array.map(fun m -> (m.brcktId, m.teamAId.Equals(team.teamId)))    //id, team A/B indication
+
+        
+            let pastLineUpCSeqIds =
+                    pastMatchIds
+                        |> Array.map(fun (matchId, isTeamA) -> 
+                                                        let teamAIds, teamBIds = getMatchLineUpCSeqIds(competitionId, divisionId, stageId, matchId)
+                                                        let teamLineUpIds = if isTeamA then teamAIds else teamBIds
+                                                        teamLineUpIds
+                                    )
+        
+            let setPlayerCounts =
+                    [|
+                        for iSet = 0 to 8 do
+                            yield 
+                                teamPlayers
+                                    |> Array.map(fun player ->
+                                                            (
+                                                                player,
+                                                                pastLineUpCSeqIds
+                                                                    |> Array.sumBy(fun mat -> if mat.[iSet] |> Array.contains(player.cSeq) then 1 else 0)
+                                                            )
+                                                )
+
+
+                    |]
+
+        
+            //Contruct line-up, stat with more restraining set
+            let mutable sets:TeamPlayerSummary[][] = [| [||];[||];[||];[||];[||];[||];[||];[||];[||]  |]
+
+            //Set 9
+            sets.[8] <-
+                [|
+                    setPlayerCounts.[8]
+                        |> Array.filter(fun (p, count) -> not ((Array.sub sets 4 5) |> Array.map(fun players -> players |> Array.contains(p)) |> Array.contains(true)) )     //check if already exists in other single sets
+                        |> Array.maxBy(fun (p, count) -> count, Convert.ToDouble(p.rtg))
+                        |> fun (p, count) -> p
+                |]
+
+            //Set 7
+            sets.[6] <-
+                [|
+                    setPlayerCounts.[6]
+                        |> Array.filter(fun (p, count) -> not ((Array.sub sets 4 5) |> Array.map(fun players -> players |> Array.contains(p)) |> Array.contains(true)) )     //check if already exists in other single sets
+                        |> Array.maxBy(fun (p, count) -> count, Convert.ToDouble(p.rtg))
+                        |> fun (p, count) -> p
+                |]
+
+            //Set 8
+            sets.[7] <-
+                [|
+                    setPlayerCounts.[7]
+                        |> Array.filter(fun (p, count) -> not ((Array.sub sets 4 5) |> Array.map(fun players -> players |> Array.contains(p)) |> Array.contains(true)) )     //check if already exists in other single sets
+                        |> Array.maxBy(fun (p, count) -> count, Convert.ToDouble(p.rtg))
+                        |> fun (p, count) -> p
+                |]
+
+            //Set 6
+            sets.[5] <-
+                [|
+                    setPlayerCounts.[5]
+                        |> Array.filter(fun (p, count) -> not ((Array.sub sets 4 5) |> Array.map(fun players -> players |> Array.contains(p)) |> Array.contains(true)) )     //check if already exists in other single sets
+                        |> Array.maxBy(fun (p, count) -> count, Convert.ToDouble(p.rtg))
+                        |> fun (p, count) -> p
+                |]
+
+            //Set 5
+            sets.[4] <-
+                [|
+                    setPlayerCounts.[4]
+                        |> Array.filter(fun (p, count) -> not ((Array.sub sets 4 5) |> Array.map(fun players -> players |> Array.contains(p)) |> Array.contains(true)) )     //check if already exists in other single sets
+                        |> Array.maxBy(fun (p, count) -> count, Convert.ToDouble(p.rtg))
+                        |> fun (p, count) -> p
+                |]
+
+
+            //Set 2
+            sets.[1] <-
+                [|
+                    (setPlayerCounts.[1]
+                        |> Array.filter(fun (p, count) -> (p.gender.Equals("F")))
+                        |> Array.maxBy(fun (p, count) -> count, Convert.ToDouble(p.rtg))
+                        |> fun (p, count) -> p
+                    );
+                    (setPlayerCounts.[1]
+                        |> Array.filter(fun (p, count) -> not (p.gender.Equals("F")))
+                        |> Array.maxBy(fun (p, count) -> count, Convert.ToDouble(p.rtg))
+                        |> fun (p, count) -> p
+                    );
+                |]
+                |> Array.sortByDescending(fun p -> Convert.ToDouble(p.rtg))
+
+
+            //Set 3
+            let candidatePlayers =
+                setPlayerCounts.[2]
+                    |> Array.filter(fun (p, count) -> not ((Array.sub sets 1 1) |> Array.map(fun players -> players |> Array.contains(p)) |> Array.contains(true)) )     //check if already exists in other double sets
+                    |> Array.sortByDescending(fun (p, count) -> count, Convert.ToDouble(p.rtg))
+                    |> Array.map(fun (p, count) -> p)
+            sets.[2] <-
+                [|candidatePlayers.[0];candidatePlayers.[1]|]
+                |> Array.sortByDescending(fun p -> Convert.ToDouble(p.rtg))
+
+
+            //Set 4
+            let candidatePlayers =
+                setPlayerCounts.[3]
+                    |> Array.filter(fun (p, count) -> not ((Array.sub sets 2 1) |> Array.map(fun players -> players |> Array.contains(p)) |> Array.contains(true)) )     //check if already exists in set 3
+                    |> Array.sortByDescending(fun (p, count) -> count, Convert.ToDouble(p.rtg))
+                    |> Array.map(fun (p, count) -> p)
+            sets.[3] <-
+                [|candidatePlayers.[0];candidatePlayers.[1];candidatePlayers.[2]|]
+                |> Array.sortByDescending(fun p -> Convert.ToDouble(p.rtg))
+
+
+            //Set 1
+            let candidatePlayers =
+                setPlayerCounts.[0]
+                    |> Array.sortByDescending(fun (p, count) -> count, Convert.ToDouble(p.rtg))
+                    |> Array.map(fun (p, count) -> p)
+            sets.[0] <-
+                [|candidatePlayers.[0];candidatePlayers.[1];candidatePlayers.[2];candidatePlayers.[3]|]
+                |> Array.sortByDescending(fun p -> Convert.ToDouble(p.rtg))
+
+        
+            //Lineup Object
+            {
+                complete = true;
+                sets = sets
+            }
+
+        with
+            | exn ->
+                {
+                    complete = false;
+                    sets = [||]
+                }
 
 
 
