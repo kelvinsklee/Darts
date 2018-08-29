@@ -14,6 +14,9 @@ curl -k -X GET "http://play.phoenixdart.com/selectPlyrResultAwardListWithCntMLJs
 Shop Detail
 curl -k -X GET "http://play.phoenixdart.com/selectShpAreaListDetailJson.do?searchShp=59399"
 
+Team Player List
+curl -k -X GET "http://play.phoenixdart.com/selectTeamMembersListJson.do?teamId=35250"
+
 
 
 

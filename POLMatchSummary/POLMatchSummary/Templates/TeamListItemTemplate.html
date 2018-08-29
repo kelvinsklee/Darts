@@ -1,18 +1,16 @@
 							<tr >
-								<td>{TeamSummary.rankNum}</td>
+								<td class="rank">{TeamSummary.rankNum}</td>
 								<td class="team">
 									<span class="photo"><a href="{TeamSummary.imageSource}" target="_blank"><img src="{TeamSummary.imageSource}"/></a></span>
 									<span class="name">{TeamSummary.teamNm}</span>
 								</td>
-								<td>{TeamSummary.rtg}</td>
-								<td>{TeamSummary.ppd}</td>
-								<td>{TeamSummary.mpr}</td>
-								<td class="rank_active">{TeamSummary.totalPt}</td>
-								<td>{TeamSummary.matchWin}</td>
-								<td>{TeamSummary.matchLose}</td>
-								<td>{TeamSummary.matchRatio}</td>
-								<td>{TeamSummary.setWin}</td>
-								<td>{TeamSummary.setLose}</td>
-								<td>{TeamSummary.setRatio}</td>
-								<td>{TeamSummary.penaltyPt}</td>
+								<td class="rating">{TeamSummary.rtg}</td>
+								<td class="ppd">{TeamSummary.ppd}</td>
+								<td class="mpr">{TeamSummary.mpr}</td>
+								<!--td class="rank">{TeamSummary.totalPt}</td-->
+								<!--td class="win">{TeamSummary.matchWin}</td>
+								<td class="lose">{TeamSummary.matchLose}</td-->
+								<td class="win">{TeamSummary.setWin}</td>
+								<td class="lose">{TeamSummary.setLose}</td>
+								<td class="ratio">{TeamSummary.setRatio}</td>
 							</tr>

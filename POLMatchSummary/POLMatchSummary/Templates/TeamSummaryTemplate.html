@@ -3,9 +3,8 @@
 	<head>
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		
 
-		<title>PHOENIX OFFICIAL COMPETITION</title>
+		<title>POL Match Overview</title>
 		
 		{teamSummaryHeader}
 	 	
@@ -17,15 +16,34 @@
 	<div class="innerDiv">
 
 			
-			<!-- team_info_box -->
 			<div class="player_info_box">
+
+				<!-- Opposing Team -->
+				<div class="box profile profile2">
+					<p class="tit">對手</p>
+					<!--div class="img">
+						<p class="resize_photo">
+							
+									<img src="http://play.phoenixdart.com/downloadTeamInforImage.do?teamId={AgainstTeamDetail.teamId}" alt="" onerror="this.src='http://images.phoenixdart.com/pdcs/front/images/no_team_image.gif'" />
+							
+						</p>
+					</div-->
+					<div class="info">
+						<p class="name">{AgainstTeamDetail.teamNm}</p>
+						<p class="team">{AgainstTeamDetail.cptNm}</p>
+						<p class="home">
+							<span class="h_name">{AgainstTeamDetail.shpNm}</span>
+						</p>
+					</div>
+				</div>
+
 
 				<!-- Match Detail -->
 				<div class="box chart">
 					<div class="box_inner">
 						<div class="hero-gallery">
 							<div class="hero-gallery__cell">
-								<p class="tit">Match Information</p>
+								<p class="tit">比賽資料</p>
 								<dl>
 									<dt>日期</dt> <!-- 승 -->
 									<dd><p class="date">{NextMatch.plyngStrtDt}</p></dd>
@@ -48,29 +66,12 @@
 				</div>
 				
 				
-				<div class="profile profile2">
-					<div class="img">
-						<p class="resize_photo">
-							
-									<img src="http://play.phoenixdart.com/downloadTeamInforImage.do?teamId={AgainstTeamDetail.teamId}" alt="" onerror="this.src='http://images.phoenixdart.com/pdcs/front/images/no_team_image.gif'" />
-							
-						</p>
-					</div>
-					<div class="info">
-						<p class="name">{AgainstTeamDetail.teamNm}</p>
-						<p class="team">{AgainstTeamDetail.cptNm}</p>
-						<p class="home">
-							<span class="h_name">{AgainstTeamDetail.shpNm}</span>
-						</p>
-					</div>
-				</div>
 
-				
-				<div class="box chart">
+				<div class="box summary">
 					<div class="box_inner">
 						<div class="hero-gallery">
 							<div class="hero-gallery__cell">
-								<p class="tit">Team Summary</p>
+								<p class="tit">數據</p>
 								<!--
 								<dl>
 									<dt>Rank</dt>
@@ -91,7 +92,11 @@
 								</dl>
 								<dl>
 									<dt>勝:敗</dt>
-									<dd>{AgainstTeamDetail.setWin}:{AgainstTeamDetail.setLose} ({AgainstTeamDetail.setRatio})</dd>
+									<dd>{AgainstTeamDetail.setWin}:{AgainstTeamDetail.setLose}</dd>
+								</dl>
+								<dl>
+									<dt>勝率</dt>
+									<dd>{AgainstTeamDetail.setRatio}</dd>
 								</dl>
 							</div>
 						</div>
@@ -116,7 +121,7 @@
 				<div class="h_a_tit">
 					<p class="home">
 						<span class="h_a">Against</span> <!-- 홈 -->
-						<span style="text-decoration: underline;" >{AgainstTeamDetail.teamNm}</span>
+						<span>{AgainstTeamDetail.teamNm}</span>
 					</p>
 				</div>
 		
@@ -137,7 +142,7 @@
 							<th>勝率</th> <!-- 무 -->
 						</tr>
 					</thead>
-					<tbody id="tbody_plyrARankingAwardList" class="even_auto">
+					<tbody class="even_auto">
 						
 						{againstTeamPlayerListItems}
 						
@@ -152,7 +157,7 @@
 				<div class="h_a_tit">
 					<p class="away">
 						<span class="h_a">Home</span> <!-- 홈 -->
-						<span style="text-decoration: underline;" >{OurTeamDetail.teamNm}</span>
+						<span>{OurTeamDetail.teamNm}</span>
 					</p>
 				</div>
 		
@@ -173,7 +178,7 @@
 							<th>勝率</th> <!-- 무 -->
 						</tr>
 					</thead>
-					<tbody id="tbody_plyrARankingAwardList" class="even_auto">
+					<tbody class="even_auto">
 						
 						{ourTeamPlayerListItems}
 						
@@ -181,40 +186,45 @@
 				</table>
 			</div>			
 			
+
+			<!-- Line Up -->
+			<div class="con_title_04">
+				<h5>排陣預測</h5> 
+			</div>
+			{againstTeamPredictedLineUp}
+
+			<!-- Line Up -->
+			<div class="con_title_04">
+				<h5>最強陣容參考</h5> 
+			</div>
+			{againstTeamStrongestLineUp}
+			
 			
 			<!-- Team Rankings -->
 			<div class="con_title_04">
 				<h5>聯賽排名</h5> <!-- 리그 순위 -->
 			</div>
-			
+
 			<div class="ranking_form">
 				<table class="tb_style01" summary="">
 					<thead>
 						<tr>
-							<th width="5%" rowspan="2" class="rank">排行</th><!-- 순위 -->
-							<th width="39%" colspan="4" >隊伍</th><!-- 팀 -->
-							<th width="9%" rowspan="2"  class="sort_team t_point cursor rank_active" id="teamSort-total_point">總積分</th><!-- Total Point -->
-							<th width="21%" colspan="3" >Match</th><!-- Match -->
-							<th width="21%" colspan="3">Set</th><!-- Set -->
-							<th width="5%" rowspan="2" class="sort_team cursor" id="teamSort-pnt_pt_num">罰分</th><!-- 벌점 -->
+							<th rowspan="2" class="rank">排行</th><!-- 순위 -->
+							<th colspan="4" >隊伍</th><!-- 팀 -->
+							<!--th rowspan="2"  class="rank">總積分</th>
+							<th colspan="2" >Match</th-->
+							<th colspan="3">Set</th><!-- Set -->
 						</tr>
 						<tr>
 							<th class="team">隊名</th> <!-- 팀 이름 -->
-							
-								
-								
-								
-									<th class="sort_team cursor" id="teamSort-rating" width="40px">Rating</th>
-								
-							
-							<th class="sort_team cursor" id="teamSort-ppd_ta" width="35px">PPD</th>
-							<th class="sort_team cursor" id="teamSort-mpr_ta" width="35px">MPR</th>
-							<th class="sort_team cursor" id="teamSort-win_gm_cnt">勝</th><!-- 승 -->
-							<th class="sort_team cursor" id="teamSort-lose_gm_cnt">敗</th><!-- 패 -->
-							<th class="sort_team cursor" id="teamSort-match_ratio">勝率</th><!-- 승률 -->
-							<th class="sort_team cursor" id="teamSort-win_set_cnt">勝</th><!-- 승 -->
-							<th class="sort_team cursor" id="teamSort-lose_set_cnt">敗</th><!-- 패 -->
-							<th class="sort_team cursor" id="teamSort-set_rto_num">勝率</th><!-- 승률 -->
+							<th class="team">Rating</th>
+							<th class="ppd">PPD</th>
+							<th class="mpr">MPR</th>
+							<!--th class="win">勝</th>
+							<th class="lose">敗</th-->
+							<th class="win">勝</th><!-- 승 -->
+							<th class="lose">敗</th><!-- 패 -->
+							<th class="ratio">勝率</th><!-- 승률 -->
 						</tr>
 					</thead>
 				
@@ -227,8 +237,10 @@
 				
 			</div>
 
+
+
 			
-			
+		<!-- end inner div -->
 		</div>
 		
 		

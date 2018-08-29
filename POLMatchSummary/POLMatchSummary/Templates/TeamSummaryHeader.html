@@ -385,12 +385,6 @@ a.balloon span.txt_balloon span { display:block; width:9px; height:7px; backgrou
 .tb_style01 td.team span.name { margin-left:52px; line-height:18px; max-height:36px; overflow:hidden; }
 .tb_style01 td.team span.name span { display:table-cell; width:100%; height:36px; vertical-align:center; }
 
-/*
-.tb_style01 td.team div.photo { display:inline-block; margin-right:6px; vertical-align:middle; width:35px; height:26px; overflow:hidden; text-align:center; }
-.tb_style01 td.team div.photo img { width:auto; height:auto; max-width:35px; max-height:26px;  }
-.tb_style01 td.team div.player { display:inline-block; width:115px; vertical-align:middle; }
-.tb_style01 td.team div.player span { display:block; width:165px; margin:0 !important; }
-*/
 .tb_style01 td.team div.photo { display:inline-block; margin-right:6px; vertical-align:middle; width:48px; height:35px; overflow:hidden; text-align:center; }
 .tb_style01 td.team div.photo img { width:auto; height:auto; max-width:46px; max-height:35px;  }
 .tb_style01 td.team div.player { display:inline-block; width:115px; vertical-align:middle; }
@@ -989,7 +983,7 @@ body { position:relative; min-width:940px; font-family:"Roboto",Arial,"Malgun Go
 .language_body { display:none; position:absolute; top:0; left:0; z-index:99990; width:100%; background:rgba(255,255,255,0); }
 
 
-.innerDiv { width:940px; margin:0 auto; }
+.innerDiv { width:650px; margin:0 auto; }
 
 
 
@@ -1596,7 +1590,7 @@ html.popup_layer_on #wrapper { padding-right:17px; overflow:hidden; }
 
 
 /* 플레이어 정보 박스 */
-.player_info_box .profile { display:table-cell; vertical-align:middle; width:375px; height:191px; background:#272727; /*box-shadow:-10px 0 8px -8px #111 inset;*/ position:relative; }
+.player_info_box .profile { display:table-cell; vertical-align:middle; height:191px; background:#272727; /*box-shadow:-10px 0 8px -8px #111 inset;*/ position:relative; }
 
 	.player_info_box .box_player { background:#272727 url(../../images/main/info_box_player.png) right top no-repeat; }
 	.player_info_box .box_team { background:#272727 url(../../images/main/info_box_team.png) right top no-repeat; }
@@ -1607,7 +1601,7 @@ html.popup_layer_on #wrapper { padding-right:17px; overflow:hidden; }
 .player_info_box .profile .img .class { padding:0 0 4px 0; text-align:center; }
 .player_info_box .profile .img .class img { width:auto; height:20px; }
 .player_info_box .profile .img .edit { padding:13px 0 10px 0; }
-.player_info_box .profile .info { display:inline-block; width:134px; margin-left:28px; padding-left:28px; border-left:1px solid #414141; vertical-align:middle; }
+.player_info_box .profile .info { display:inline-block; width:100px; margin-left:28px; padding-left:28px; vertical-align:middle; }
 .player_info_box .profile .info .name { height:48px; line-height:24px; font-size:20px; font-weight:bold; color:#e4e4e4; overflow:hidden; word-break:break-all; white-space:normal; }
 .player_info_box .profile .info .team { margin-top:13px; height:24px; line-height:24px; font-size:14px; color:#e4e4e4; overflow:hidden; }
 .player_info_box .profile .info .team .selectWrap,
@@ -1622,6 +1616,7 @@ html.popup_layer_on #wrapper { padding-right:17px; overflow:hidden; }
 .player_info_box .profile .info .map { display:inline-block; margin-left:4px; margin-top:-2px; vertical-align:top; cursor:pointer; }
 .player_info_box .profile .info .date { display:block; }
 .player_info_box .profile .info .location { margin-top:15px; font-size:11px; color:#676767; }
+.player_info_box .profile .tit { padding:13px 10px 10px 10px; font-size:18px; font-weight:300; color:#818181; }
 
 .player_info_box .profile .info .captain { padding:15px 0 12px 0; }
 .player_info_box .profile .info .captain .c_photo { float:left; width:40px; height:34px; margin-right:5px; overflow:hidden; text-align:center; }
@@ -1695,22 +1690,26 @@ html.popup_layer_on #wrapper { padding-right:17px; overflow:hidden; }
 .player_info_box .profile_team4 .img { padding:0 10px; }
 
 
-
-
 .player_info_box .box { display:table-cell; background:#272727; box-shadow:-10px 0 8px -8px #151515 inset; vertical-align:top; }
 .player_info_box .box .box_inner { height:191px; border-left:2px solid #4b4b4b; box-shadow:10px 0 8px -8px #151515 inset; }
-.player_info_box .total { width:130px; }
+.player_info_box .summary { width:150px; }
+.player_info_box .summary .box_inner { padding:0 26px 0 15px; }
+.player_info_box .summary .tit { padding:13px 0 10px 0; font-size:18px; font-weight:300; color:#818181; }
+.player_info_box .summary dl { clear:both; padding:5px 0; line-height:15px; }
+.player_info_box .summary dt { display:table-cell; width:44px; text-indent:2px; font-size:11px; color:#d3d3d3; vertical-align:middle; }
+.player_info_box .summary dd { display:table-cell; width:50px; vertical-align:middle; color:#ff0066 }
+.player_info_box .total { width:100px; }
 .player_info_box .total .box_inner { padding:0 14px; }
 .player_info_box .total p { font-weight:300; }
-.player_info_box .total .tit { padding:13px 0 10px 0; font-size:20px; color:#fff; line-height:24px; border-bottom:1px solid #414141; }
-.player_info_box .total .point { padding-top:30px; font-size:68px; color:#ff5402; text-align:right; text-shadow:1px 1px 3px #000; }
-.player_info_box .chart { width:222px; }
+.player_info_box .total .tit { padding:13px 0 10px 0; font-size:18px; font-weight:300; color:#818181; }
+.player_info_box .total .point { padding-top:30px; font-size:68px; color:#ff5402; text-align:middle; text-shadow:1px 1px 3px #000; }
+.player_info_box .chart { width:200px; }
 .player_info_box .chart .box_inner { padding:0 26px 0 15px; }
 .player_info_box .chart .tit { padding:13px 0 10px 0; font-size:18px; font-weight:300; color:#818181; }
 .player_info_box .chart dl { clear:both; padding:5px 0; line-height:15px; }
 .player_info_box .chart dt { display:table-cell; width:44px; text-indent:2px; font-size:11px; color:#d3d3d3; vertical-align:middle; }
 .player_info_box .chart dd { display:table-cell; width:135px; vertical-align:middle; color:#ff9900 }
-.player_info_box .map_link { display:table-cell; width:135px; vertical-align:middle; text-decoration:underline; color:#ff9900 }
+.player_info_box .map_link { display:table-cell; width:135px; vertical-align:middle; text-decoration:underline; color:#3399ff }
 
 .player_info_box .ratings2 { float:none; width:210px; display:table-cell; vertical-align:top; }
 .player_info_box .ratings2 .graph_each { width:208px; margin-top:0; border:0 none; }
@@ -2073,12 +2072,12 @@ html.popup_layer_on #wrapper { padding-right:17px; overflow:hidden; }
 
 
 /* 대회결과 표 */
-.result_match_each { clear:both; position:relative; }
-.result_match_each .result_match_top .set { height:30px; padding:4px 0; background:#b1b1b1; text-align:center; position:relative; }
-.result_match_each .result_match_top .set span { display:inline-block; line-height:28px; padding:0 18px; font-size:20px; color:#fff; font-weight:300; border:1px solid #fff; -moz-border-radius:20px; -webkit-border-radius:20px; border-radius:20px; vertical-align:middle; }
-.result_match_each .result_match_top .set strong { display:inline-block; line-height:30px; margin-left:10px; font-size:24px; color:#fff; font-weight:normal; vertical-align:middle; }
+.result_match_each { clear:both; position:relative; width:470px;}
+.result_match_each .result_match_top .set { height:16px; padding:4px 4px; background:#b1b1b1; text-align:left; position:relative; }
+.result_match_each .result_match_top .set span { display:inline-block; line-height:14px; padding:0 18px; font-size:12px; color:#fff; font-weight:300; border:1px solid #fff; -moz-border-radius:20px; -webkit-border-radius:20px; border-radius:20px; vertical-align:middle; }
+.result_match_each .result_match_top .set strong { display:inline-block; line-height:14px; margin-left:10px; font-size:12px; color:#fff; font-weight:normal; vertical-align:middle; }
 .result_match_each .result_match_top .set em { position:absolute; bottom:7px; right:14px; color:#fff; }
-.result_match_each .player { width:233px; }
+.result_match_each .player { width:255px; }
 .result_match_each .ppd { width:70px; text-align:center; }
 .result_match_each .score { width:67px; text-align:center; }
 .result_match_each .leg { width:192px; }
