@@ -46,6 +46,7 @@ let main argv =
     let teamListItemTemplateFile = ConfigurationManager.AppSettings.["TeamListItemTemplateFile"].Trim()
     let playerListItemTemplateFile = ConfigurationManager.AppSettings.["PlayerListItemTemplateFile"].Trim()
     let summaryHeaderFile = ConfigurationManager.AppSettings.["SummaryHeaderFile"].Trim()
+    let lineUpTemplateFile = ConfigurationManager.AppSettings.["LineUpTemplateFile"].Trim()
    
     let fromEmailAddress = ConfigurationManager.AppSettings.["FromEmailAddress"].Trim()
     let fromEmailName = ConfigurationManager.AppSettings.["FromEmailName"].Trim()
@@ -55,6 +56,39 @@ let main argv =
     //let teamMatches = readTeamMatchHistory(competitionId, divisionId, stageId, teamId)
     //let teamPlayers = readTeamPlayerResult(competitionId, divisionId, stageId, teamId)
     //let shopDetail = readShopDetail("59399")
+
+
+    let webRequest = createPOLWebRequest("http://play.phoenixdart.com/selectMatchDetailML.do?cpttnId=16106&searchDivision=38140&searchStage=49242&brcktId=666153")
+    let webResponse = webRequest.GetResponse() :?> HttpWebResponse
+    
+    let matchHtml = readFromTextStream(webResponse.GetResponseStream())
+    let setsGross = matchHtml.Split([|"""<div class="result_match_each">"""|], StringSplitOptions.RemoveEmptyEntries) |> Array.tail
+    let playerIdsGross = 
+                    setsGross
+                        |> Array.map(fun setGross -> 
+                                        let playersGross = setGross.Split([|"""getmemberphoto?c_seq="""|], StringSplitOptions.RemoveEmptyEntries) |> Array.tail
+                                        playersGross
+                                            |> Array.map(fun playerGross ->
+                                                                let endPos = playerGross.IndexOf("\"")
+                                                                playerGross.Substring(0, endPos)
+                                                        )
+                                    )
+    let playerIds = [|
+                        [|playerIdsGross.[0].[0]; playerIdsGross.[0].[0]; playerIdsGross.[0].[0]; playerIdsGross.[0].[0];|]
+                    |]
+
+
+    Console.WriteLine(matchHtml)
+    //Write to Html
+    try
+        let sw = new System.IO.StreamWriter("C:\\Temp\\POLTestOutput.html")
+                                
+        sw.WriteLine(matchHtml)
+        sw.Close()
+    with 
+        | exn -> 
+            Console.WriteLine(String.Format("Error writing header trade to file/stream!"))
+
 
     let teams = readTeams(competitionId, divisionId, stageId, teamId)
 
@@ -75,6 +109,7 @@ let main argv =
     let teamListItemTemplate = readFromTextFile(teamListItemTemplateFile)
     let playerListItemTemplate = readFromTextFile(playerListItemTemplateFile)
     let summaryHeaderHtml = readFromTextFile(summaryHeaderFile)
+    let lineUpTemplate = readFromTextFile(lineUpTemplateFile)
 
 
     let teamListHtml = 
@@ -94,7 +129,11 @@ let main argv =
                                     let teamHtml  = teamHtml.Replace("{TeamSummary.setLose}", HttpUtility.HtmlEncode(team.setLose.ToString()))
                                     let teamHtml  = teamHtml.Replace("{TeamSummary.setRatio}", HttpUtility.HtmlEncode(team.setRatio.ToString()+"%"))
                                     let teamHtml  = teamHtml.Replace("{TeamSummary.imageSource}", if (team.imgMd5Txt.Length>0) then 
-                                                                                                        HttpUtility.HtmlEncode("http://play.phoenixdart.com/downloadTeamInforImage.do?teamId=" + team.teamId)
+                                                                                                        //HttpUtility.HtmlEncode("http://play.phoenixdart.com/downloadTeamInforImage.do?teamId=" + team.teamId)
+                                                                                                        let webRequest = createPOLWebRequest("http://play.phoenixdart.com/downloadTeamInforImage.do?teamId=" + team.teamId)
+                                                                                                        let webResponse = webRequest.GetResponse() :?> HttpWebResponse
+                                                                                                        let imgBase64 = readFromStreamToBase64(webResponse.GetResponseStream())
+                                                                                                        "data:image/png;base64, " + imgBase64
                                                                                                   else
                                                                                                         HttpUtility.HtmlEncode("http://images.phoenixdart.com/pdcs/front/images/no_team_image.gif")
                                                                     )
@@ -141,6 +180,20 @@ let main argv =
             |> String.concat("\n")
 
 
+
+    let nextAgainstTeamStrongestLineUp = findStrongestLineUp(nextAgainstTeamPlayers)
+    let mutable nextAgainstTeamLineUpHtml = lineUpTemplate
+    
+    for iSet = 0 to nextAgainstTeamStrongestLineUp.sets.Length-1 do
+        for iPlayer = 0 to nextAgainstTeamStrongestLineUp.sets.[iSet].Length-1 do
+            nextAgainstTeamLineUpHtml <- nextAgainstTeamLineUpHtml.Replace(String.Format("{{Player.{0}.{1}.cSeq}}", iSet, iPlayer), HttpUtility.HtmlEncode(nextAgainstTeamStrongestLineUp.sets.[iSet].[iPlayer].cSeq.ToString()))
+            nextAgainstTeamLineUpHtml <- nextAgainstTeamLineUpHtml.Replace(String.Format("{{Player.{0}.{1}.plyrNm}}", iSet, iPlayer), HttpUtility.HtmlEncode(nextAgainstTeamStrongestLineUp.sets.[iSet].[iPlayer].plyrNm.ToString()))
+            nextAgainstTeamLineUpHtml <- nextAgainstTeamLineUpHtml.Replace(String.Format("{{Player.{0}.{1}.rtg}}", iSet, iPlayer), HttpUtility.HtmlEncode(nextAgainstTeamStrongestLineUp.sets.[iSet].[iPlayer].rtg.ToString()))
+            nextAgainstTeamLineUpHtml <- nextAgainstTeamLineUpHtml.Replace(String.Format("{{Player.{0}.{1}.ppd}}", iSet, iPlayer), HttpUtility.HtmlEncode(nextAgainstTeamStrongestLineUp.sets.[iSet].[iPlayer].ppd.ToString()))
+            nextAgainstTeamLineUpHtml <- nextAgainstTeamLineUpHtml.Replace(String.Format("{{Player.{0}.{1}.mpr}}", iSet, iPlayer), HttpUtility.HtmlEncode(nextAgainstTeamStrongestLineUp.sets.[iSet].[iPlayer].mpr.ToString()))
+
+
+
     let summaryHtml = summaryTemplate
     let summaryHtml = summaryHtml.Replace("{competitionId}", HttpUtility.HtmlEncode(competitionId.ToString()))
     let summaryHtml = summaryHtml.Replace("{divisionId}", HttpUtility.HtmlEncode(divisionId.ToString()))
@@ -167,10 +220,11 @@ let main argv =
     let summaryHtml = summaryHtml.Replace("{NextMatchShop.latitude}", HttpUtility.HtmlEncode(nextMatchShop.latitude.ToString()))
     let summaryHtml = summaryHtml.Replace("{NextMatchShop.longitude}", HttpUtility.HtmlEncode(nextMatchShop.longitude.ToString()))
     let summaryHtml = summaryHtml.Replace("{NextMatchShop.sSeq}", HttpUtility.HtmlEncode(nextMatchShop.sSeq.ToString()))
-    let summaryHtml = summaryHtml.Replace("{teamListItems}", teamListHtml)
     let summaryHtml = summaryHtml.Replace("{againstTeamPlayerListItems}", againstPlayerListHtml)
     let summaryHtml = summaryHtml.Replace("{ourTeamPlayerListItems}", ourPlayerListHtml)
+    let summaryHtml = summaryHtml.Replace("{againstTeamLineUp}", nextAgainstTeamLineUpHtml)
     let summaryHtml = summaryHtml.Replace("{teamSummaryHeader}", summaryHeaderHtml)
+    let summaryHtml = summaryHtml.Replace("{teamListItems}", teamListHtml)
     
 
 

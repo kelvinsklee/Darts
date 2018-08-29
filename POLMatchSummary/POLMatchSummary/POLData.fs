@@ -3,6 +3,7 @@
 open System
 open System.IO
 open System.Configuration
+open System.Net
 open System.Web
 open System.Data
 open System.Collections.Generic
@@ -286,15 +287,7 @@ module POLData =
     type MatchLineUp =
         {
             complete: bool
-            set1: TeamPlayerSummary[]
-            set2: TeamPlayerSummary[]
-            set3: TeamPlayerSummary[]
-            set4: TeamPlayerSummary[]
-            set5: TeamPlayerSummary[]
-            set6: TeamPlayerSummary[]
-            set7: TeamPlayerSummary[]
-            set8: TeamPlayerSummary[]
-            set9: TeamPlayerSummary[]
+            sets: TeamPlayerSummary[][]
         }
 
 
@@ -390,6 +383,15 @@ module POLData =
 
         objects    
 
+
+    ///Create webrequest with necessary headers and cookies
+    let createPOLWebRequest(uri:string) = 
+        let cookieContainer = new CookieContainer()
+        cookieContainer.SetCookies(Uri("http://play.phoenixdart.com"), "accessClient=116.50.57.180,clientNation=HK,clientLanguage=zh_HK,lang=HKG,mylang=HKG")
+        let webRequest = WebRequest.Create(uri) :?> HttpWebRequest
+        webRequest.UserAgent <- "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.2 (KHTML, like Gecko) Chrome/15.0.874.121 Safari/535.2"
+        webRequest.CookieContainer <- cookieContainer
+        webRequest
         
 
     ///Reads text from file
@@ -402,6 +404,32 @@ module POLData =
         |> String.concat("\n")
 
 
+    ///Reads text from stream
+    let readFromTextStream(textStream:Stream) = 
+        seq {
+            use sr = new StreamReader (textStream)
+            while not sr.EndOfStream do
+                yield sr.ReadLine ()
+        }
+        |> String.concat("\n")
+
+
+    ///Reads binary and covert to Base64
+    let readFromStreamToBase64(binaryStream:Stream) = 
+        let byteData =
+            [|
+                use br = new BinaryReader(binaryStream)
+                let mutable eos = false
+                while (not eos) do 
+                    yield 
+                        try
+                            br.ReadByte()
+                        with
+                            | exn -> 
+                                    eos <- true
+                                    new Byte()
+            |]
+        Convert.ToBase64String(byteData)
 
 
     ///Read teams in group from POL
@@ -613,7 +641,7 @@ module POLData =
         
         let playersSorted = 
                         players
-                            |> Array.sortBy(fun p -> Convert.ToDouble(p.rtg))
+                            |> Array.sortByDescending(fun p -> Convert.ToDouble(p.rtg))
 
         let femalePlayers = 
                         playersSorted
@@ -628,31 +656,37 @@ module POLData =
                         |> Array.filter(fun p -> p.plyrId <> topFemalePlayer.plyrId)
                         |> Array.take 5
 
+
+            let sets = 
+                        [|
+                            [|topPlayers.[0];topPlayers.[1];topPlayers.[4];topFemalePlayer|];
+                            [|topPlayers.[0];topFemalePlayer|];
+                            [|topPlayers.[1];topPlayers.[2]|];
+                            [|topPlayers.[0];topPlayers.[3];(if (Convert.ToDouble(topPlayers.[4].rtg)>Convert.ToDouble(topFemalePlayer.rtg)) then topPlayers.[4] else topFemalePlayer)|];
+                            [|topFemalePlayer|];
+                            [|topPlayers.[3]|];
+                            [|topPlayers.[1]|];
+                            [|topPlayers.[2]|];
+                            [|topPlayers.[0]|]
+                        |]
+            
+            //Sort by rating
+            let setsSorted = 
+                        [|
+                            for set in sets do
+                                yield set |> Array.sortByDescending(fun p -> Convert.ToDouble(p.rtg))
+                        |]
+                    
+
             //Lineup Object
             {
                 complete = true;
-                set1= [|topPlayers.[0];topPlayers.[1];topPlayers.[4];topFemalePlayer|];
-                set2= [|topPlayers.[0];topFemalePlayer|];
-                set3= [|topPlayers.[1];topPlayers.[2]|];
-                set4= [|topPlayers.[0];topPlayers.[3];topPlayers.[4];topFemalePlayer|];
-                set5= [|topFemalePlayer|];
-                set6= [|topPlayers.[3]|];
-                set7= [|topPlayers.[2]|];
-                set8= [|topPlayers.[1]|];
-                set9= [|topPlayers.[0]|]
+                sets = setsSorted
             }
         else
             {
                 complete = true;
-                set1= [||];
-                set2= [||];
-                set3= [||];
-                set4= [||];
-                set5= [||];
-                set6= [||];
-                set7= [||];
-                set8= [||];
-                set9= [||]
+                sets = [||]
             }
 
 
